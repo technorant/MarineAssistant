@@ -2,10 +2,13 @@ import { db, auth } from './firebase-config.js';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
+const GROQ_API_KEY = "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";
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
+    const typingContainer = document.getElementById('typing-container');
     const chips = document.querySelectorAll('.chip');
 
     let currentUser = null;
@@ -22,8 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const message = chatInput.value.trim();
             if (message && currentUser) {
-                await saveMessage('user', message);
+                // Append immediately for better UX
+                appendMessageToUI('user', message);
                 chatInput.value = '';
+                
+                // Save in background
+                saveMessage('user', message).catch(err => console.warn("Firestore blocked by client:", err));
+                
+                // Generate AI response
                 generateAIResponse(message);
             }
         });
@@ -33,7 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
         chip.addEventListener('click', () => {
             const message = chip.textContent;
             if (currentUser) {
-                saveMessage('user', message);
+                appendMessageToUI('user', message);
+                saveMessage('user', message).catch(err => console.warn("Firestore blocked by client:", err));
                 generateAIResponse(message);
             }
         });
@@ -68,32 +78,79 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function appendMessageToUI(sender, text) {
+    function appendMessageToUI(sender, text, isTyping = false) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', `${sender}-message`);
+        if (isTyping) messageDiv.classList.add('typing-indicator');
         messageDiv.textContent = text;
-        chatMessages.appendChild(messageDiv);
+        
+        const container = isTyping ? typingContainer : chatMessages;
+        container.appendChild(messageDiv);
+        
         chatMessages.scrollTop = chatMessages.scrollHeight;
+        return messageDiv;
     }
 
-    function generateAIResponse(userInput) {
-        const input = userInput.toLowerCase();
-        let response = "I'm not sure about that. Try asking about fishing safety, fish health, or feeding tips.";
+    async function generateAIResponse(userInput) {
+        const startTime = Date.now();
+        // Show typing indicator
+        const typingIndicator = appendMessageToUI('ai', 'Thinking', true);
 
-        if (input.includes('fish dying')) {
-            response = "Check oxygen levels and water temperature immediately. Low oxygen is a common cause of mass mortality. Consider testing for ammonia and nitrites too.";
-        } else if (input.includes('safe')) {
-            response = "Current maritime conditions for Coastal Kenya are moderate. Avoid deep waters today and keep a look out for rising swells.";
-        } else if (input.includes('feed')) {
-            response = "For aquaculture, ensure you are feeding 2-3% of body weight daily. Monitor consumption to avoid water quality issues from uneaten food.";
-        } else if (input.includes('hello') || input.includes('hi')) {
-            response = "Hello! I am your Antech AI Marine Assistant. How can I help you with your marine activities today?";
-        }
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${GROQ_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "llama-3.1-8b-instant",
+                    messages: [
+                        {
+                            role: "system",
+                            content: "You are the BlueEconomy Marine Assistant. Provide extremely concise, precise, and direct answers. Avoid conversational filler or long introductions. Focus ONLY on marine topics: fishing, aquaculture, fish health, and maritime safety. If a query is unrelated, briefly decline and redirect to marine topics. Maximum length: 2-3 sentences."
+                        },
+                        {
+                            role: "user",
+                            content: userInput
+                        }
+                    ],
+                    temperature: 0.5,
+                    max_tokens: 200,
+                    stream: false
+                })
+            });
 
-        setTimeout(() => {
-            if (currentUser) {
-                saveMessage('ai', response);
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                console.error("Groq API Detailed Error:", data);
+                throw new Error(data.error?.message || `API request failed with status ${response.status}`);
             }
-        }, 1000);
+
+            const aiResponse = data.choices[0].message.content;
+
+            // Ensure at least 2 seconds of "Thinking..." time
+            const elapsedTime = Date.now() - startTime;
+            const delay = Math.max(0, 2000 - elapsedTime);
+
+            setTimeout(() => {
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Show response in UI
+                appendMessageToUI('ai', aiResponse);
+
+                // Save in background
+                if (currentUser) {
+                    saveMessage('ai', aiResponse).catch(err => console.warn("Firestore blocked by client:", err));
+                }
+            }, delay);
+
+        } catch (error) {
+            console.error("Groq API Error:", error);
+            typingIndicator.textContent = "Error: Could not connect to the AI service. Please try again later.";
+            typingIndicator.classList.remove('typing-indicator');
+        }
     }
 });
