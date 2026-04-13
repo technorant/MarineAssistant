@@ -5,6 +5,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     initMobileNav();
+    initSidebarToggle();
     
     // Attach logout to all logout buttons
     const logoutBtns = document.querySelectorAll('.logout-btn');
@@ -34,9 +35,50 @@ function checkAuth() {
         }
     });
 }
-
 function initMobileNav() {
-    // Logic for hamburger menu if added later
+    const sidebar = document.querySelector('.sidebar');
+    const hamburger = document.querySelector('.mobile-hamburger');
+    const overlay = document.querySelector('.mobile-overlay');
+    const closeBtn = document.querySelector('.mobile-close');
+    
+    if (!sidebar || !hamburger || !overlay) return;
+
+    const closeNav = () => {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+    };
+
+    hamburger.addEventListener('click', () => {
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('active');
+    });
+
+    overlay.addEventListener('click', closeNav);
+    if (closeBtn) closeBtn.addEventListener('click', closeNav);
+
+    // Close on link click
+    const navLinks = sidebar.querySelectorAll('.nav-item');
+    navLinks.forEach(link => {
+        link.addEventListener('click', closeNav);
+    });
+}
+
+function initSidebarToggle() {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.querySelector('#sidebar-toggle');
+    
+    if (!sidebar || !toggleBtn) return;
+
+    // Load persisted state
+    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
+    });
 }
 
 async function logout() {
