@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Status | BlueEconomy</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <style>
+        .safety-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .status-indicator {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+        .location-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #e0f2f1;
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">🌊 BlueEconomy</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">Dashboard</a>
+                <a href="chat.html" class="nav-item">Chat Assistant</a>
+                <a href="safety.html" class="nav-item active">Safety Status</a>
+                <a href="knowledge.html" class="nav-item">Knowledge Base</a>
+                <a href="profile.html" class="nav-item">Profile</a>
+            </nav>
+            <a href="#" onclick="logout()" class="nav-item logout-btn">Logout</a>
+        </aside>
+
+        <main class="main-content">
+            <header class="welcome-header">
+                <h1>Maritime Safety Monitoring</h1>
+                <p>Real-time updates for Coastal Kenya.</p>
+            </header>
+
+            <div class="safety-card fade-in">
+                <div class="location-badge">📍 Coastal Kenya</div>
+                <h2>Current Safety Status: <span id="safety-status">Checking...</span></h2>
+                <div id="safety-indicator" class="status-indicator">⚓</div>
+                <p id="safety-advice" style="font-size: 1.1rem; margin-top: 20px; color: #666;"></p>
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                <p><small>Next update in 30 minutes. Always check official meteorological reports before heading out.</small></p>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

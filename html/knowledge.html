@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Base | BlueEconomy</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <style>
+        .kb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .kb-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        .kb-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+        }
+        .kb-card ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+        .kb-card li {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">🌊 BlueEconomy</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">Dashboard</a>
+                <a href="chat.html" class="nav-item">Chat Assistant</a>
+                <a href="safety.html" class="nav-item">Safety Status</a>
+                <a href="knowledge.html" class="nav-item active">Knowledge Base</a>
+                <a href="profile.html" class="nav-item">Profile</a>
+            </nav>
+            <a href="#" onclick="logout()" class="nav-item logout-btn">Logout</a>
+        </aside>
+
+        <main class="main-content">
+            <header class="welcome-header">
+                <h1>Knowledge Base</h1>
+                <p>Learn more about sustainable fishing and aquaculture.</p>
+            </header>
+
+            <div class="kb-grid">
+                <div class="kb-card">
+                    <h3>🎣 Fishing Tips</h3>
+                    <ul>
+                        <li>Identify the best tidal windows for reef fishing.</li>
+                        <li>Maintain your outboards to prevent mid-sea failures.</li>
+                        <li>Keep fish on ice immediately after harvest for quality.</li>
+                        <li>Use size-selective gear to protect juvenile fish.</li>
+                    </ul>
+                </div>
+                <div class="kb-card">
+                    <h3>🐟 Aquaculture</h3>
+                    <ul>
+                        <li>Monitor water pH daily (optimal range: 6.5 - 8.5).</li>
+                        <li>Control stocking density to prevent disease spread.</li>
+                        <li>Implement predator nets to protect your fingerlings.</li>
+                        <li>Feed at consistent times to improve growth rates.</li>
+                    </ul>
+                </div>
+                <div class="kb-card">
+                    <h3>🛟 Safety Guidelines</h3>
+                    <ul>
+                        <li>Always carry a registered VHF radio or cell phone.</li>
+                        <li>Ensure life jackets are available for everyone on board.</li>
+                        <li>Tell someone your expected return time before leaving.</li>
+                        <li>Watch for sudden changes in wind direction and cloud patterns.</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/app.js"></script>
+</body>
+</html>
