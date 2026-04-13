@@ -48,6 +48,42 @@
     border-bottom-left-radius: 4px;
 }
 
+#typing-container {
+    padding: 0 20px 10px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 10px 15px;
+    align-items: center;
+    min-height: 40px;
+}
+
+.typing-indicator::after {
+    content: '...';
+    font-weight: bold;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    animation: dots 1.5s steps(4, end) infinite;
+    display: inline-block;
+}
+
+@keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.4; }
+}
+
 .chat-input-area {
     padding: 20px;
     border-top: 1px solid #eee;
