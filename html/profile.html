@@ -44,17 +44,28 @@
     </style>
 </head>
 <body>
+    <div class="mobile-overlay"></div>
+    <header class="mobile-header">
+        <div class="sidebar-logo" style="margin-bottom: 0;">🌊 BlueEconomy</div>
+        <button class="mobile-hamburger">☰</button>
+    </header>
     <div class="dashboard-layout">
         <aside class="sidebar">
-            <div class="sidebar-logo">🌊 BlueEconomy</div>
+            <div class="sidebar-logo">
+                <span>🌊 BlueEconomy</span>
+                <div class="sidebar-controls">
+                    <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
+                    <button class="mobile-close">✕</button>
+                </div>
+            </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-item">Dashboard</a>
-                <a href="chat.html" class="nav-item">Chat Assistant</a>
-                <a href="safety.html" class="nav-item">Safety Status</a>
-                <a href="knowledge.html" class="nav-item">Knowledge Base</a>
-                <a href="profile.html" class="nav-item active">Profile</a>
+                <a href="dashboard.html" class="nav-item"><i>📊</i> <span>Dashboard</span></a>
+                <a href="chat.html" class="nav-item"><i>💬</i> <span>Chat Assistant</span></a>
+                <a href="safety.html" class="nav-item"><i>🛡️</i> <span>Safety Status</span></a>
+                <a href="knowledge.html" class="nav-item"><i>📚</i> <span>Knowledge Base</span></a>
+                <a href="profile.html" class="nav-item active"><i>👤</i> <span>Profile</span></a>
             </nav>
-            <a href="#" onclick="logout()" class="nav-item logout-btn">Logout</a>
+            <a href="#" class="nav-item logout-btn"><i>🚪</i> <span>Logout</span></a>
         </aside>
 
         <main class="main-content">
