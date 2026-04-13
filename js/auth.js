@@ -1,25 +1,30 @@
+import { auth } from './firebase-config.js';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
 
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = e.target.email.value;
             const password = e.target.password.value;
 
-            // Simulate auth
-            if (email && password) {
-                localStorage.setItem('antech_user', JSON.stringify({ email }));
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                localStorage.setItem('antech_user', JSON.stringify({ email: user.email }));
                 window.location.href = 'dashboard.html';
-            } else {
-                alert('Please enter valid credentials');
+            } catch (error) {
+                console.error("Login Error:", error.code, error.message);
+                alert(error.message);
             }
         });
     }
 
     if (registerForm) {
-        registerForm.addEventListener('submit', (e) => {
+        registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = e.target.email.value;
             const password = e.target.password.value;
@@ -30,11 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (email && password) {
-                localStorage.setItem('antech_user', JSON.stringify({ email }));
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                localStorage.setItem('antech_user', JSON.stringify({ email: user.email }));
                 window.location.href = 'dashboard.html';
-            } else {
-                alert('Please fill in all fields');
+            } catch (error) {
+                console.error("Registration Error:", error.code, error.message);
+                alert(error.message);
             }
         });
     }

@@ -1,15 +1,28 @@
+import { db, auth } from './firebase-config.js';
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
     const chips = document.querySelectorAll('.chip');
 
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            loadMessages();
+        }
+    });
+
     if (chatForm) {
-        chatForm.addEventListener('submit', (e) => {
+        chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const message = chatInput.value.trim();
-            if (message) {
-                appendMessage('user', message);
+            if (message && currentUser) {
+                await saveMessage('user', message);
                 chatInput.value = '';
                 generateAIResponse(message);
             }
@@ -19,12 +32,43 @@ document.addEventListener('DOMContentLoaded', () => {
     chips.forEach(chip => {
         chip.addEventListener('click', () => {
             const message = chip.textContent;
-            appendMessage('user', message);
-            generateAIResponse(message);
+            if (currentUser) {
+                saveMessage('user', message);
+                generateAIResponse(message);
+            }
         });
     });
 
-    function appendMessage(sender, text) {
+    async function saveMessage(sender, text) {
+        try {
+            await addDoc(collection(db, "messages"), {
+                uid: currentUser.uid,
+                sender: sender,
+                text: text,
+                timestamp: serverTimestamp()
+            });
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
+    }
+
+    function loadMessages() {
+        const q = query(
+            collection(db, "messages"),
+            where("uid", "==", currentUser.uid),
+            orderBy("timestamp", "asc")
+        );
+
+        onSnapshot(q, (snapshot) => {
+            chatMessages.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const msg = doc.data();
+                appendMessageToUI(msg.sender, msg.text);
+            });
+        });
+    }
+
+    function appendMessageToUI(sender, text) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', `${sender}-message`);
         messageDiv.textContent = text;
@@ -47,7 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         setTimeout(() => {
-            appendMessage('ai', response);
+            if (currentUser) {
+                saveMessage('ai', response);
+            }
         }, 1000);
     }
 });

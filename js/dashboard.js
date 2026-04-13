@@ -1,20 +1,21 @@
+import { auth } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
 document.addEventListener('DOMContentLoaded', () => {
-    const user = JSON.parse(localStorage.getItem('antech_user'));
     const userNameElement = document.getElementById('user-name');
     const userEmailElement = document.getElementById('user-email');
-
-    if (userNameElement && user) {
-        userNameElement.textContent = user.email.split('@')[0];
-    }
-
-    if (userEmailElement && user) {
-        userEmailElement.textContent = user.email;
-    }
-
     const displayNameElement = document.getElementById('display-name');
-    if (displayNameElement && user) {
-        displayNameElement.textContent = user.email.split('@')[0].toUpperCase();
-    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const email = user.email;
+            const name = email.split('@')[0];
+            
+            if (userNameElement) userNameElement.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+            if (userEmailElement) userEmailElement.textContent = email;
+            if (displayNameElement) displayNameElement.textContent = name.toUpperCase();
+        }
+    });
 
     // Safety simulation logic for safety page
     const safetyStatus = document.getElementById('safety-status');
