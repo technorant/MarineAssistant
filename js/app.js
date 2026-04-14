@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
-            logout();
+            logout(btn);
         });
     });
 });
@@ -81,13 +81,27 @@ function initSidebarToggle() {
     });
 }
 
-async function logout() {
+async function logout(btnElement = null) {
+    let originalContent = '';
     try {
+        if (btnElement) {
+            btnElement.disabled = true;
+            originalContent = btnElement.innerHTML;
+            btnElement.textContent = 'Logging out...';
+            
+            // Wait for 2 seconds as requested
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
         await signOut(auth);
         localStorage.removeItem('antech_user');
         window.location.href = 'index.html';
     } catch (error) {
         console.error("Logout Error:", error);
+        if (btnElement) {
+            btnElement.disabled = false;
+            btnElement.innerHTML = originalContent;
+        }
     }
 }
 
